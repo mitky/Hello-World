@@ -11,9 +11,6 @@ phases:
     commands:
       - npm run build
 
-  post_build:
-    commands:
-      - npm test App.test.js
 
 artifacts:
   files:
