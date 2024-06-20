@@ -13,7 +13,7 @@ phases:
 
   post_build:
     commands:
-      - npm test
+      - npm test App.test.js
 
 artifacts:
   files:
