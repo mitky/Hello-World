@@ -13,11 +13,5 @@ phases:
 
 artifacts:
   files:
-    - 'build/**/*'
-    - 'node_modules/**/*'
-    - 'package.json'
-    - 'package-lock.json'
-
-cache:
-  paths:
-    - 'node_modules/**/*'
+    - '**/*' # Include all files to ensure `node_modules` is included
+  discard-paths: no
