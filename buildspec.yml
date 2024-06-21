@@ -2,17 +2,22 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      nodejs: 14
     commands:
+      - echo "Installing Node.js version 14..."
+      - n 14
       - npm install
-  
+
   build:
     commands:
       - npm run build
 
-
 artifacts:
   files:
-    - '**/*'
-  base-directory: build
+    - 'build/**/*'
+    - 'node_modules/**/*'
+    - 'package.json'
+    - 'package-lock.json'
+
+cache:
+  paths:
+    - 'node_modules/**/*'
