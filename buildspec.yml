@@ -14,5 +14,6 @@ phases:
 
 artifacts:
   files:
-    - '**/*' # Include all files to ensure `node_modules` is included
-  discard-paths: no
+    - '**/*'
+  base-directory: build
+  discard-paths: yes
