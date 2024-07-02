@@ -30,6 +30,10 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - script: |
+        npm ci
+      displayName: 'Install dependencies using npm ci'
+    
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
