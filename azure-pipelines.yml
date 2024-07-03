@@ -46,11 +46,13 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
+        tarCompression: 'gz'
+        verbose: true
 
     - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       artifact: 'drop'
@@ -69,16 +71,27 @@ stages:
       runOnce:
         deploy:
           steps:
+          - download: current
+            artifact: drop
+            displayName: 'Download Build Artifact'
+
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              destinationFolder: '$(System.DefaultWorkingDirectory)/extracted_files'
+              cleanDestinationFolder: true
+
           - task: AzureRmWebAppDeployment@4
             displayName: 'Azure App Service Deploy: $(webAppName)'
             inputs:
               azureSubscription: $(azureSubscription)
               appType: 'webAppLinux'
               WebAppName: $(webAppName)
-              packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              packageForLinux: '$(System.DefaultWorkingDirectory)/extracted_files'
               RuntimeStack: 'NODE|18-lts'
               StartupCommand: 'npm start'
               ScriptType: 'Inline Script'
               InlineScript: |
+                cd $(System.DefaultWorkingDirectory)/extracted_files
                 npm ci --production
                 npm run build --if-present
