@@ -32,27 +32,27 @@ stages:
     - task: NodeTool@0
       inputs:
         versionSpec: '18.x'
-        displayName: 'Install Node.js'
+      displayName: 'Install Node.js'
 
     - script: |
         npm install -g npm@latest
       displayName: 'Install latest npm'
 
     - script: |
-        npm install
-        npm run build --if-present
+        npm ci
+        npm run build
       displayName: 'Install dependencies and build'
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
-    - upload: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       artifact: 'drop'
 
 - stage: Deploy
@@ -77,7 +77,7 @@ stages:
               WebAppName: $(webAppName)
               packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
               RuntimeStack: 'NODE|18-lts'
-              StartupCommand: 'npm run start'
+              StartupCommand: 'npm start'
               ScriptType: 'Inline Script'
               InlineScript: |
                 npm ci --production
