@@ -7,9 +7,16 @@ trigger:
 - master
 
 variables:
+  # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'c59c4ee5-1317-4f87-8802-1e382f5ce256'
+
+  # Web app name
   webAppName: 'Dimitar-Shikrenov'
+
+  # Environment name
   environmentName: 'Dimitar-Shikrenov'
+
+  # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:
@@ -24,30 +31,28 @@ stages:
     - task: NodeTool@0
       inputs:
         versionSpec: '18.x'
-      displayName: 'Install Node.js'
+        displayName: 'Install Node.js'
 
     - script: |
         npm install -g npm@latest
       displayName: 'Install latest npm'
 
     - script: |
-        cd $(System.DefaultWorkingDirectory)/extracted_files
-        npm ci --production
-        npm install  # Install all dependencies including dev dependencies
+        npm install
         npm run build --if-present
-      displayName: 'Install dependencies and build in extracted directory'
+      displayName: 'Install dependencies and build'
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/extracted_files'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
-    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      artifact: 'drop'
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifact: drop
 
 - stage: Deploy
   displayName: Deploy stage
@@ -63,29 +68,16 @@ stages:
       runOnce:
         deploy:
           steps:
-          - download: current
-            artifact: drop
-            displayName: 'Download Build Artifact'
-
-          - task: ExtractFiles@1
-            displayName: 'Extract files'
-            inputs:
-              archiveFilePatterns: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
-              destinationFolder: '$(System.DefaultWorkingDirectory)/extracted_files'
-              cleanDestinationFolder: true
-
-          - script: |
-              cd $(System.DefaultWorkingDirectory)/extracted_files
-              npm ci --production
-              npm run build --if-present
-            displayName: 'Install dependencies and build in extracted directory'
-
           - task: AzureRmWebAppDeployment@4
             displayName: 'Azure App Service Deploy: $(webAppName)'
             inputs:
               azureSubscription: $(azureSubscription)
               appType: 'webAppLinux'
               WebAppName: $(webAppName)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/extracted_files'
+              packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
               RuntimeStack: 'NODE|18-lts'
-              StartupCommand: 'npm start'
+              StartupCommand: 'npm run start'
+              ScriptType: 'Inline Script'
+              InlineScript: |
+                npm ci --production
+                npm run build --if-present
