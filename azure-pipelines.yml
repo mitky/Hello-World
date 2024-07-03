@@ -7,7 +7,6 @@ trigger:
 - master
 
 variables:
-
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'c59c4ee5-1317-4f87-8802-1e382f5ce256'
 
@@ -29,7 +28,19 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-   
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x' # Specify the Node.js version you need
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm ci
+      displayName: 'Install dependencies using npm ci'
+
+    - script: |
+        npm run build --if-present
+      displayName: 'Build'
+
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
@@ -63,9 +74,9 @@ stages:
               appType: webAppLinux
               WebAppName: $(webAppName)
               packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
-              RuntimeStack: 'NODE|10.10'
+              RuntimeStack: 'NODE|18.x' # Update to match the Node.js version used in the Build stage
               StartupCommand: 'npm run start'
               ScriptType: 'Inline Script'
               InlineScript: |
-                npm install
+                npm install --production
                 npm run build --if-present
