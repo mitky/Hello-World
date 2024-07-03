@@ -28,8 +28,16 @@ stages:
     displayName: Build
     pool:
       vmImage: $(vmImageName)
-
     steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x' # specify the Node.js version you need
+      displayName: 'Install Node.js'
+    
+    - script: |
+        npm ci
+      displayName: 'Install dependencies using npm ci'
+
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
