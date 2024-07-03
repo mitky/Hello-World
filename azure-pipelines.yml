@@ -7,6 +7,7 @@ trigger:
 - master
 
 variables:
+
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'c59c4ee5-1317-4f87-8802-1e382f5ce256'
 
@@ -30,28 +31,31 @@ stages:
     steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '18.x' # Specify the Node.js version you need
+        versionSpec: '18.x'
+        displayName: 'Install Node.js'
       displayName: 'Install Node.js'
 
     - script: |
-        npm ci
-      displayName: 'Install dependencies using npm ci'
+        npm install -g npm@latest
+        npm cache clean --force
+      displayName: 'Upgrade npm and clean cache'
 
     - script: |
+        npm install
         npm run build --if-present
-      displayName: 'Build'
+      displayName: 'Install dependencies and build'
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
         includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
-    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      artifact: drop
+    - upload: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      artifact: 'drop'
 
 - stage: Deploy
   displayName: Deploy stage
@@ -68,13 +72,13 @@ stages:
         deploy:
           steps:
           - task: AzureRmWebAppDeployment@4
-            displayName: 'Azure App Service Deploy: Dimitar-Shikrenov'
+            displayName: 'Azure App Service Deploy: $(webAppName)'
             inputs:
               azureSubscription: $(azureSubscription)
-              appType: webAppLinux
+              appType: 'webAppLinux'
               WebAppName: $(webAppName)
               packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
-              RuntimeStack: 'NODE|18.x' # Update to match the Node.js version used in the Build stage
+              RuntimeStack: 'NODE|18.x'
               StartupCommand: 'npm run start'
               ScriptType: 'Inline Script'
               InlineScript: |
