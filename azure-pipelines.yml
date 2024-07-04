@@ -21,8 +21,24 @@ variables:
   vmImageName: 'ubuntu-latest'
 
 stages:
+- stage: Test
+  displayName: Test stage
+  jobs:
+  - job: Test
+    displayName: Run Tests
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+    - script: |
+        echo "Running tests..."
+        npm install
+        npm test
+      displayName: 'Execute tests'
+
 - stage: Build
   displayName: Build stage
+  dependsOn: Test
   jobs:
   - job: Build
     displayName: Build
