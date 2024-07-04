@@ -31,9 +31,32 @@ stages:
 
     steps:
     - script: |
-        echo "Running tests..."
+        echo "Installing Node.js version 18..."
+        # Setup Node.js version 18
+        sudo apt-get install -y nodejs
+        sudo apt-get install -y npm
+        sudo npm cache clean -f
+        sudo npm install -g n
+        sudo n 18.0.0
+        node -v
+        npm -v
+      displayName: 'Install Node.js'
+
+    - script: |
+        echo "Installing dependencies..."
         npm install
-        npm test
+        npm cache clean --force  # Clean npm cache
+        npm install react-scripts@latest --save-dev  # Reinstall react-scripts
+      displayName: 'Install dependencies'
+
+    - script: |
+        echo "Restoring dependencies..."
+        npm ci # Use `npm ci` to install dependencies from `package-lock.json`
+      displayName: 'Restore dependencies'
+
+    - script: |
+        echo "Running tests..."
+        CI=true npm test -- --forceExit --detectOpenHandles || exit 1
       displayName: 'Execute tests'
 
 - stage: Build
