@@ -1,26 +1,30 @@
 #!/bin/bash
 
-# Determine the deployment directory
-DEPLOY_DIR=$(find /opt/codedeploy-agent/deployment-root/ -type d -name 'deployment-archive' | head -n 1)
+# Get the deployment directory path using DEPLOYMENT_ID
+DEPLOYMENT_ROOT="/opt/codedeploy-agent/deployment-root/$DEPLOYMENT_ID/deployment-archive"
 
-# Print the deployment directory for debugging
-echo "Deployment directory: $DEPLOY_DIR"
+echo "Deployment directory: $DEPLOYMENT_ROOT"
 
 # Navigate to the deployment directory
-cd "$DEPLOY_DIR" || { echo "Failed to navigate to deployment directory"; exit 1; }
+cd $DEPLOYMENT_ROOT
 
-# Print the current directory for debugging
-pwd
+# Install npm packages
+echo "Installing npm packages..."
+npm install --production  # Use --production flag if you don't need development dependencies
 
-# Install Node.js and npm
-echo "Installing Node.js and npm..."
-curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-yum install -y nodejs
+# Check if npm packages are installed correctly
+if [ $? -ne 0 ]; then
+  echo "Error: npm install failed. Exiting..."
+  exit 1
+fi
 
-# Verify installation
-node -v
-npm -v
+# Additional commands if needed, like building or compiling assets
+# Example: npm run build
 
-# Install dependencies
-echo "Installing dependencies..."
-npm install
+echo "Dependencies installed successfully."
+
+# Ensure proper file permissions if necessary
+# Example: chmod +x some_script.sh
+
+# Exit with success
+exit 0
