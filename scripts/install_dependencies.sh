@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Capture the deployment ID provided by CodeDeploy
-DEPLOYMENT_ID=$DEPLOYMENT_GROUP_ID
-
-# Construct the path to the deployment directory
-DEPLOYMENT_DIR="/opt/codedeploy-agent/deployment-root/$DEPLOYMENT_ID/deployment-archive"
+# Define the deployment directory path
+DEPLOYMENT_DIR="/opt/codedeploy-agent/deployment-root/$DEPLOYMENT_GROUP_ID/deployment-archive"
 
 # Check if the deployment directory exists
 if [ ! -d "$DEPLOYMENT_DIR" ]; then
@@ -13,13 +10,10 @@ if [ ! -d "$DEPLOYMENT_DIR" ]; then
 fi
 
 # Navigate to the deployment directory
-cd "$DEPLOYMENT_DIR" || exit 1  # Exit script if cd fails
+cd "$DEPLOYMENT_DIR" || exit 1
 
-# Example: Install dependencies with npm
+# Example: Install npm dependencies
 echo "Installing npm packages..."
-npm install
-
-# Example: Run start_server.sh script
-
+npm install --production
 
 # Add more commands as needed for your deployment process
