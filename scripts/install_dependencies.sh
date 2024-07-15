@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the deployment directory path
-DEPLOYMENT_DIR="/opt/codedeploy-agent/deployment-root/$DEPLOYMENT_GROUP_ID/deployment-archive"
+DEPLOYMENT_DIR="/opt/codedeploy-agent/deployment-root/$DEPLOYMENT_GROUP_ID/$DEPLOYMENT_ID/deployment-archive"
 
 # Check if the deployment directory exists
 if [ ! -d "$DEPLOYMENT_DIR" ]; then
