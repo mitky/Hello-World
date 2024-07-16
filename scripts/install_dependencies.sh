@@ -16,4 +16,8 @@ cd "$DEPLOYMENT_DIR" || exit 1
 echo "Installing npm packages..."
 npm install --production
 
+# Start the server (adjust this command based on how you start your server)
+echo "Starting the server..."
+npm start
+
 # Add more commands as needed for your deployment process
