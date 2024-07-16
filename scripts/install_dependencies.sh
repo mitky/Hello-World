@@ -1,23 +1,22 @@
 #!/bin/bash
 
-# Define the deployment directory path
-DEPLOYMENT_DIR="/opt/codedeploy-agent/deployment-root/$DEPLOYMENT_GROUP_ID/$DEPLOYMENT_ID/deployment-archive"
+# Find the deployment directory
+DEPLOY_DIR=$(find /opt/codedeploy-agent/deployment-root/6c862eca-1c33-4cdc-9bba-c28bad60fd6b -type d -name deployment-archive | head -n 1)
 
-# Check if the deployment directory exists
-if [ ! -d "$DEPLOYMENT_DIR" ]; then
-    echo "Deployment directory $DEPLOYMENT_DIR not found. Exiting..."
+if [ -z "$DEPLOY_DIR" ]; then
+    echo "Deployment directory not found. Exiting..."
     exit 1
 fi
 
-# Navigate to the deployment directory
-cd "$DEPLOYMENT_DIR" || exit 1
+echo "Deployment directory: $DEPLOY_DIR"
+cd "$DEPLOY_DIR" || exit
 
-# Example: Install npm dependencies
+# Install all dependencies
 echo "Installing npm packages..."
-npm install 
+npm install --production
 
-# Start the server (adjust this command based on how you start your server)
-echo "Starting the server..."
-npm start
+# Build the project
+echo "Building the project..."
+npm run build
 
-# Add more commands as needed for your deployment process
+echo "Dependencies installed and project built successfully."
