@@ -14,7 +14,7 @@ cd "$DEPLOYMENT_DIR" || exit 1
 
 # Example: Install npm dependencies
 echo "Installing npm packages..."
-npm install --production
+npm install 
 
 # Start the server (adjust this command based on how you start your server)
 echo "Starting the server..."
