@@ -20,3 +20,16 @@ echo "Building the project..."
 npm run build
 
 echo "Dependencies installed and project built successfully."
+
+# Navigate to build directory
+cd build
+
+# Copy files to Apache document root
+sudo cp -r * /var/www/html/
+
+# Set ownership and permissions
+sudo chown -R apache:apache /var/www/html/*
+sudo chmod -R 755 /var/www/html/*
+
+# Restart Apache to apply changes
+sudo systemctl restart httpd
