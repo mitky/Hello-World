@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Find the deployment directory
-DEPLOY_DIR=$(find /opt/codedeploy-agent/deployment-root/6c862eca-1c33-4cdc-9bba-c28bad60fd6b -type d -name deployment-archive | head -n 1)
+# Find the latest deployment directory
+LATEST_DEPLOY_DIR=$(ls -dt /opt/codedeploy-agent/deployment-root/6c862eca-1c33-4cdc-9bba-c28bad60fd6b/d-*/deployment-archive | head -n 1)
 
-if [ -z "$DEPLOY_DIR" ]; then
+if [ -z "$LATEST_DEPLOY_DIR" ]; then
     echo "Deployment directory not found. Exiting..."
     exit 1
 fi
 
-echo "Deployment directory: $DEPLOY_DIR"
-cd "$DEPLOY_DIR" || exit
+echo "Deployment directory: $LATEST_DEPLOY_DIR"
+cd "$LATEST_DEPLOY_DIR" || exit
 
 # Install all dependencies
 echo "Installing npm packages..."
