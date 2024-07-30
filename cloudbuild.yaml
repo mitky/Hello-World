@@ -1,0 +1,19 @@
+steps:
+- name: 'node:18'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    npm install
+    npm run build
+
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', '-r', 'build/*', 'gs://dimitar_bucket/']
+
+images: []
+artifacts:
+  objects:
+    location: 'gs://dimitar_bucket/'
+    paths: ['build/**']
+
+timeout: '600s'
