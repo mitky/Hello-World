@@ -16,4 +16,7 @@ artifacts:
     location: 'gs://dimitar_bucket/'
     paths: ['build/**']
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 timeout: '600s'
