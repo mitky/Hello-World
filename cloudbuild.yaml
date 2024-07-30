@@ -4,7 +4,21 @@ steps:
   args:
   - '-c'
   - |
+    echo "Installing Node.js version 18..."
+    npm install -g npm@latest
+    npm cache clean --force
+    echo "Preparing for clean install..."
+    rm -rf node_modules
+    rm -f package-lock.json
+    echo "Installing dependencies..."
     npm install
+
+- name: 'node:18'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo "Building the application..."
     npm run build
 
 - name: 'gcr.io/cloud-builders/gsutil'
