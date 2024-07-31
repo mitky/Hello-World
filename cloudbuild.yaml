@@ -7,11 +7,28 @@ steps:
     echo "Installing Node.js version 18..."
     npm install -g npm@latest
     npm cache clean --force
+    npm install react-scripts@latest --save-dev
     echo "Preparing for clean install..."
     rm -rf node_modules
     rm -f package-lock.json
     echo "Installing dependencies..."
     npm install
+
+- name: 'node:18'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo "Restoring dependencies..."
+    npm ci  # Use `npm ci` to install dependencies from `package-lock.json`
+
+- name: 'node:18'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo "Running tests..."
+    CI=true npm test -- --forceExit --detectOpenHandles || exit 1
 
 - name: 'node:18'
   entrypoint: 'bash'
