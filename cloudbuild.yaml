@@ -19,7 +19,7 @@ steps:
   - '-c'
   - |
     echo "Running tests..."
-    npm test  # Ensure this command is correct for running your tests
+    CI=true npm test -- --watchAll=false --forceExit --detectOpenHandles || exit 1
 
 - name: 'node:18'
   entrypoint: 'bash'
@@ -30,7 +30,7 @@ steps:
     npm run build
 
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', -r', 'build/*', 'gs://dimitar_bucket/']
+  args: ['cp', '-r', 'build/*', 'gs://dimitar_bucket/']
 
 images: []
 artifacts:
