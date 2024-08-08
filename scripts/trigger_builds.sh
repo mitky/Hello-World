@@ -4,7 +4,7 @@
 BUILD_COUNT=10
 
 # Path to your Cloud Build configuration file
-CONFIG_FILE="cloudbuild.yaml"
+CONFIG_FILE="../cloudbuild.yaml"
 
 # Trigger builds in parallel
 for i in $(seq 1 $BUILD_COUNT); do
